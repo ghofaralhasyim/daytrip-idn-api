@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS banners;
+DROP TABLE IF EXISTS web_settings;
+DROP TABLE IF EXISTS destinations;
+DROP TABLE IF EXISTS activities;
