@@ -13,7 +13,7 @@ CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     phone VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    package_id INT NOT NULL,
+    package_name VARCHAR(255) NOT NULL,
     message TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
@@ -22,10 +22,10 @@ CREATE TABLE banners (
     id SERIAL PRIMARY KEY,
     desktop_image VARCHAR(255),
     mobile_image VARCHAR(255),
-    cta VARCHAR(255),
-    cta_url VARCHAR(255),
-    title VARCHAR(255),
-    description VARCHAR(255)
+    cta VARCHAR(255) NULL,
+    cta_url VARCHAR(255) NULL,
+    title VARCHAR(255) NULL,
+    description VARCHAR(255) NULL
 );
 
 CREATE TABLE web_settings (

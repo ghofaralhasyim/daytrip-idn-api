@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/daytrip-idn-api/internal/middleware"
+	"github.com/daytrip-idn-api/internal/modules"
 	"github.com/daytrip-idn-api/internal/routes"
 	"github.com/daytrip-idn-api/pkg/database"
 	"github.com/daytrip-idn-api/pkg/utils"
@@ -40,7 +41,9 @@ func main() {
 	}
 	defer db.Close()
 
-	routes.SetupRoutes(echo, db)
+	modules := modules.NewAppModules(db)
+
+	routes.SetupRoutes(echo, modules)
 
 	if os.Getenv("STAGE_STATUS") == "production" {
 		utils.StartServerWithGracefulShutdown(echo)

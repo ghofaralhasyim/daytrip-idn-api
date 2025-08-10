@@ -17,7 +17,8 @@ func GenerateSessionToken(user *models.User) (string, error) {
 	}
 
 	claims := jwt.MapClaims{}
-	claims["user_id"] = user.UserId
+	claims["id"] = user.Id
+	claims["role"] = user.Role
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(hoursCount)).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

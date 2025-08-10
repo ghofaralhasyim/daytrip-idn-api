@@ -1,15 +1,14 @@
 package repositories
 
 import (
+	"context"
 	"database/sql"
-	"time"
 
 	"github.com/daytrip-idn-api/internal/models"
 )
 
 type UserRepository interface {
-	GetUserByEmail(email string) (*models.User, error)
-	GetUserById(userId int) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 type userRepository struct {
@@ -20,10 +19,12 @@ func NewUserRepository(db *sql.DB) UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
+func (r *userRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	query := `
 		SELECT 
-			u.user_id, u.name, u.email, u.password_hash, u.created_at, u.updated_at
+			u.id, u.name, u.email, u.phone,
+			u.image, u.password_hash, u.role, 
+			u.created_at
 		FROM
 			users u
 		WHERE 
@@ -31,54 +32,19 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	`
 
 	var user models.User
-	var updated sql.NullString
+	var image sql.NullString
 
-	err := r.db.QueryRow(query, email).Scan(&user.UserId, &user.Name, &user.Email, &user.PasswordHash, &user.CreatedAt, &updated)
+	err := r.db.QueryRowContext(ctx, query, email).Scan(
+		&user.Id, &user.Name, &user.Email,
+		&user.Phone, &image, &user.PasswordHash,
+		&user.Role, &user.CreatedAt,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	if updated.Valid {
-		layout := "2006-01-02T15:04:05Z"
-
-		parsedTime, err := time.Parse(layout, updated.String)
-		if err != nil {
-			return nil, err
-		}
-
-		user.UpdatedAt = parsedTime
-	}
-
-	return &user, nil
-}
-
-func (r *userRepository) GetUserById(userId int) (*models.User, error) {
-	query := `
-		SELECT 
-			u.user_id, u.name, u.email, u.password_hash, u.created_at, u.updated_at
-		FROM
-			users u
-		WHERE 
-			u.user_id = $1;
-	`
-
-	var user models.User
-	var updated sql.NullString
-
-	err := r.db.QueryRow(query, user).Scan(&user.UserId, &user.Name, &user.Email, &user.PasswordHash, &user.CreatedAt, &updated)
-	if err != nil {
-		return nil, err
-	}
-
-	if updated.Valid {
-		layout := "2006-01-02T15:04:05Z"
-
-		parsedTime, err := time.Parse(layout, updated.String)
-		if err != nil {
-			return nil, err
-		}
-
-		user.UpdatedAt = parsedTime
+	if image.Valid {
+		user.Image = image.String
 	}
 
 	return &user, nil

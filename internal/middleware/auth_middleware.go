@@ -30,7 +30,8 @@ func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if !ok {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Failed to extract claims from token"})
 		}
-		userId, ok := claims["user_id"].(float64)
+
+		userId, ok := claims["id"].(float64)
 		if !ok {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Invalid token claims"})
 		}
