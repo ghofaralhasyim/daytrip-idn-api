@@ -27,4 +27,17 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 		m.Controllers.Message.DeleteMessage,
 		middleware.AuthMiddleware,
 	)
+
+	apiv1.GET("/activity",
+		m.Controllers.Activity.GetActivities,
+		middleware.AuthMiddleware,
+	)
+
+	apiv1.POST("/invitations/attendance",
+		m.Controllers.Invitation.InsertAttendance,
+	)
+
+	apiv1.GET("/invitations/attendance",
+		m.Controllers.Invitation.GetAttendance,
+	)
 }

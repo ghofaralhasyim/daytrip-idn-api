@@ -1,67 +1,12 @@
-package utils
+package helpers
 
 import (
 	"database/sql"
 	"errors"
-	"net/http"
 	"reflect"
 	"strings"
-
-	error_app "github.com/daytrip-idn-api/internal/error"
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
+	"time"
 )
-
-func ValidateRequest(req interface{}, err error) ([]map[string]string, error) {
-	var validationErrors []map[string]string
-
-	val := reflect.TypeOf(req)
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-	}
-
-	if val.Kind() != reflect.Struct {
-		return nil, errors.New("expected a struct type for validation")
-	}
-
-	if validationErrs, ok := err.(validator.ValidationErrors); ok {
-		for _, e := range validationErrs {
-			structField, _ := val.FieldByName(e.Field())
-			jsonTag := structField.Tag.Get("json")
-			if jsonTag == "" {
-				jsonTag = strings.ToLower(e.Field())
-			}
-
-			friendlyMessage := GetFriendlyErrorMessage(e)
-			validationErrors = append(validationErrors, map[string]string{
-				jsonTag: friendlyMessage,
-			})
-		}
-	}
-
-	if len(validationErrors) > 0 {
-		return validationErrors, nil
-	}
-	return nil, nil
-}
-
-func GetFriendlyErrorMessage(e validator.FieldError) string {
-	field := strings.ToLower(e.Field())
-	switch e.Tag() {
-	case "required":
-		return field + " is required"
-	case "email":
-		return field + " must be a valid email address"
-	case "min":
-		return field + " must have at least " + e.Param() + " characters"
-	case "max":
-		return field + " must have no more than " + e.Param() + " characters"
-	case "strongpassword":
-		return field + " must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character"
-	default:
-		return e.Error()
-	}
-}
 
 func GenerateSelectColumns[T any](alias *string) string {
 	var t T
@@ -259,20 +204,44 @@ func ScanRowToStruct[T any](row *sql.Row, columns []string) (T, error) {
 	return t, nil
 }
 
-func EchoError(ctx echo.Context, err error) error {
-	if err == nil {
-		return nil
+func NullString(ns sql.NullString) *string {
+	if ns.Valid {
+		return &ns.String
 	}
+	return nil
+}
 
-	if appErr, ok := err.(*error_app.AppError); ok {
-		return ctx.JSON(appErr.StatusCode, map[string]interface{}{
-			"code":    appErr.Code,
-			"message": appErr.Message,
-		})
+func NullInt64(ni sql.NullInt64) *int64 {
+	if ni.Valid {
+		return &ni.Int64
 	}
+	return nil
+}
 
-	return ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
-		"code":    "UNKNOWN_ERROR",
-		"message": "something went wrong",
-	})
+func NullTime(nt sql.NullTime) *time.Time {
+	if nt.Valid {
+		return &nt.Time
+	}
+	return nil
+}
+
+func NewNullString(s *string) sql.NullString {
+	if s == nil {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{String: *s, Valid: true}
+}
+
+func NewNullInt64(i *int64) sql.NullInt64 {
+	if i == nil {
+		return sql.NullInt64{Valid: false}
+	}
+	return sql.NullInt64{Int64: *i, Valid: true}
+}
+
+func NewNullTime(t *time.Time) sql.NullTime {
+	if t == nil {
+		return sql.NullTime{Valid: false}
+	}
+	return sql.NullTime{Time: *t, Valid: true}
 }

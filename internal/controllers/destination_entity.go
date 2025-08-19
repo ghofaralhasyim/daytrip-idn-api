@@ -5,7 +5,7 @@ import (
 
 	response_transform "github.com/daytrip-idn-api/internal/rest/transform"
 	"github.com/daytrip-idn-api/internal/usecases"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,7 +24,7 @@ func NewDestinationController(
 func (c *DestinationController) GetDestinations(ctx echo.Context) error {
 	destination, err := c.destinationUsecase.GetDestinations(ctx)
 	if err != nil {
-		return utils.EchoError(ctx, err)
+		return helpers.EchoError(ctx, err)
 	}
 
 	response := response_transform.TransformListDestinationResponse(destination)

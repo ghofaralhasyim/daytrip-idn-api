@@ -10,7 +10,7 @@ import (
 	rest_request "github.com/daytrip-idn-api/internal/rest/request"
 	response_transform "github.com/daytrip-idn-api/internal/rest/transform"
 	"github.com/daytrip-idn-api/internal/usecases"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -30,7 +30,7 @@ func NewMessageController(
 func (c *MessageController) GetMessages(ctx echo.Context) error {
 	messages, err := c.messageUsecase.GetMessages(ctx)
 	if err != nil {
-		return utils.EchoError(ctx, err)
+		return helpers.EchoError(ctx, err)
 	}
 
 	response := response_transform.TransformListMessageResponse(messages)
@@ -52,7 +52,7 @@ func (c *MessageController) InsertMessage(ctx echo.Context) error {
 
 		for _, e := range err.(validator.ValidationErrors) {
 			fieldName := strings.ToLower(e.Field())
-			friendlyMessage := utils.GetFriendlyErrorMessage(e)
+			friendlyMessage := helpers.GetFriendlyErrorMessage(e)
 
 			validationErrors = append(validationErrors, map[string]string{
 				fieldName: friendlyMessage,
@@ -74,7 +74,7 @@ func (c *MessageController) InsertMessage(ctx echo.Context) error {
 
 	result, err := c.messageUsecase.InsertMessage(ctx, reqEntity)
 	if err != nil {
-		return utils.EchoError(ctx, err)
+		return helpers.EchoError(ctx, err)
 	}
 
 	response := response_transform.TransformMessageResponse(result)
@@ -90,12 +90,12 @@ func (c *MessageController) DeleteMessage(ctx echo.Context) error {
 	messageIdInt, err := strconv.Atoi(messageId)
 	if err != nil {
 		appErr := error_app.NewAppError(error_app.UsecaseValidateError, err)
-		return utils.EchoError(ctx, appErr)
+		return helpers.EchoError(ctx, appErr)
 	}
 
 	err = c.messageUsecase.DeleteMessage(ctx, int64(messageIdInt))
 	if err != nil {
-		return utils.EchoError(ctx, err)
+		return helpers.EchoError(ctx, err)
 	}
 
 	return ctx.JSON(http.StatusAccepted, map[string]interface{}{

@@ -7,7 +7,7 @@ import (
 
 	"github.com/daytrip-idn-api/internal/entities"
 	"github.com/daytrip-idn-api/internal/models"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 )
 
 type (
@@ -60,7 +60,7 @@ func (r *destinationRepository) InsertDestination(
 
 func (r *destinationRepository) GetDestinations(ctx context.Context) ([]entities.DestinationEntity, error) {
 
-	column := utils.GenerateSelectColumns[models.Destination](nil)
+	column := helpers.GenerateSelectColumns[models.Destination](nil)
 
 	query := `SELECT ` + column + " FROM destinations"
 
@@ -70,7 +70,7 @@ func (r *destinationRepository) GetDestinations(ctx context.Context) ([]entities
 	}
 	defer rows.Close()
 
-	results, err := utils.ScanRowsToStructs[models.Destination](rows)
+	results, err := helpers.ScanRowsToStructs[models.Destination](rows)
 	if err != nil {
 		return nil, err
 	}

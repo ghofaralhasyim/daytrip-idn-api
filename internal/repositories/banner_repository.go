@@ -6,7 +6,7 @@ import (
 
 	"github.com/daytrip-idn-api/internal/entities"
 	"github.com/daytrip-idn-api/internal/models"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 )
 
 type (
@@ -61,7 +61,7 @@ func (r *bannerRepository) InsertBanner(
 
 func (r *bannerRepository) GetBanners(ctx context.Context) ([]entities.BannerEntity, error) {
 
-	column := utils.GenerateSelectColumns[models.Banner](nil)
+	column := helpers.GenerateSelectColumns[models.Banner](nil)
 
 	query := `SELECT ` + column + " FROM banners;"
 
@@ -71,7 +71,7 @@ func (r *bannerRepository) GetBanners(ctx context.Context) ([]entities.BannerEnt
 	}
 	defer rows.Close()
 
-	results, err := utils.ScanRowsToStructs[models.Banner](rows)
+	results, err := helpers.ScanRowsToStructs[models.Banner](rows)
 	if err != nil {
 		return nil, err
 	}

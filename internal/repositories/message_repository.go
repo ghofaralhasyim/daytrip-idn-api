@@ -6,7 +6,7 @@ import (
 
 	"github.com/daytrip-idn-api/internal/entities"
 	"github.com/daytrip-idn-api/internal/models"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 )
 
 type (
@@ -58,7 +58,7 @@ func (r *messageRepository) GetMessages(
 	ctx context.Context,
 ) ([]entities.MessageEntity, error) {
 
-	column := utils.GenerateSelectColumns[models.Message](nil)
+	column := helpers.GenerateSelectColumns[models.Message](nil)
 
 	query := `SELECT ` + column + " FROM messages;"
 
@@ -67,7 +67,7 @@ func (r *messageRepository) GetMessages(
 		return nil, err
 	}
 
-	results, err := utils.ScanRowsToStructs[models.Message](rows)
+	results, err := helpers.ScanRowsToStructs[models.Message](rows)
 	if err != nil {
 		return nil, err
 	}

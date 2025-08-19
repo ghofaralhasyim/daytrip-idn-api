@@ -7,7 +7,7 @@ import (
 
 	rest_request "github.com/daytrip-idn-api/internal/rest/request"
 	"github.com/daytrip-idn-api/internal/usecases"
-	"github.com/daytrip-idn-api/pkg/utils"
+	"github.com/daytrip-idn-api/pkg/utils/helpers"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
@@ -33,7 +33,7 @@ func (c *UserController) Login(ctx echo.Context) error {
 
 		for _, e := range err.(validator.ValidationErrors) {
 			fieldName := strings.ToLower(e.Field())
-			friendlyMessage := utils.GetFriendlyErrorMessage(e)
+			friendlyMessage := helpers.GetFriendlyErrorMessage(e)
 
 			validationErrors = append(validationErrors, map[string]string{
 				fieldName: friendlyMessage,
@@ -49,7 +49,7 @@ func (c *UserController) Login(ctx echo.Context) error {
 	user, token, err := c.userUsecase.Authenticate(ctx, req.Email, req.Password)
 	if err != nil {
 		fmt.Println(err)
-		return utils.EchoError(ctx, err)
+		return helpers.EchoError(ctx, err)
 	}
 
 	user.PasswordHash = ""

@@ -5,3 +5,7 @@ DROP TABLE IF EXISTS web_settings;
 DROP TABLE IF EXISTS destinations;
 DROP TABLE IF EXISTS activities;
 DROP TABLE IF EXISTS yachts;
+DROP TABLE IF EXISTS invitation_templates;
+DROP TABLE IF EXISTS invitation_template_assets;
+DROP TABLE IF EXISTS invitations;
+DROP TABLE IF EXISTS invitation_assets;
