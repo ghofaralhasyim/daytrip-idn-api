@@ -108,7 +108,7 @@ CREATE TABLE invitation_response (
     invitation_id INT REFERENCES invitations(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     is_attending VARCHAR(10) NOT NULL,
-    message TEXT
+    message TEXT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
