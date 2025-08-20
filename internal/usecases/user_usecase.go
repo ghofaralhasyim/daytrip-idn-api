@@ -38,7 +38,7 @@ func (s *userUsecase) Authenticate(ctx echo.Context, email string, password stri
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, "", errors.New("unauthorize")
+		return nil, "", error_app.NewAppError(error_app.InvalidCredentials, errors.New("invalid credentials"))
 	}
 
 	jwt, err := utils.GenerateSessionToken(user)
