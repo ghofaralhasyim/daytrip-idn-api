@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	error_app "github.com/daytrip-idn-api/internal/error"
+	error_app "github.com/daytrip-idn-api/internal/error/app"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )

@@ -10,23 +10,21 @@ import (
 )
 
 type ImageStorageUsecase interface {
-	Save(fileHeader *multipart.FileHeader) (string, error)
+	Save(path string, fileHeader *multipart.FileHeader) (string, error)
 }
 
 type imageStorageUsecase struct {
 	publicDir string
-	baseURL   string
 }
 
-func NewImageStorageUsecase(publicDir string, baseURL string) ImageStorageUsecase {
+func NewImageStorageUsecase(publicDir string) ImageStorageUsecase {
 	return &imageStorageUsecase{
 		publicDir: publicDir,
-		baseURL:   baseURL,
 	}
 }
 
 // Save copies the uploaded file to the public directory and returns the public URL
-func (u *imageStorageUsecase) Save(fileHeader *multipart.FileHeader) (string, error) {
+func (u *imageStorageUsecase) Save(paht string, fileHeader *multipart.FileHeader) (string, error) {
 	src, err := fileHeader.Open()
 	if err != nil {
 		return "", fmt.Errorf("failed to open uploaded file: %w", err)
@@ -35,7 +33,7 @@ func (u *imageStorageUsecase) Save(fileHeader *multipart.FileHeader) (string, er
 
 	ext := filepath.Ext(fileHeader.Filename)
 	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	dstPath := filepath.Join(u.publicDir, filename)
+	dstPath := filepath.Join(u.publicDir, paht, filename)
 
 	dst, err := os.Create(dstPath)
 	if err != nil {
@@ -47,5 +45,5 @@ func (u *imageStorageUsecase) Save(fileHeader *multipart.FileHeader) (string, er
 		return "", fmt.Errorf("failed to copy file: %w", err)
 	}
 
-	return u.baseURL + filename, nil
+	return dstPath, nil
 }

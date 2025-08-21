@@ -9,6 +9,9 @@ import (
 
 type (
 	InvitationUsecase interface {
+		CreateInvitation(ctx echo.Context, e entities.InvitationEntity) (int64, error)
+		GetInvitations(ctx echo.Context) ([]entities.InvitationEntity, error)
+		GetInvitationBySlug(ctx echo.Context, slug string) (*entities.InvitationEntity, error)
 	}
 
 	invitationUsecase struct {
@@ -32,15 +35,29 @@ func (u *invitationUsecase) CreateInvitation(ctx echo.Context, e entities.Invita
 		e.Slug = helpers.GenerateSlug(e.Title)
 	}
 
-	var assets []entities.InvitationAssetEntity
-	for _, asset := range e.Assets {
-		publicURL, err := u.imageStorage.Save(&asset.FileHeader)
-		if err != nil {
-			return 0, err
-		}
-		asset.AssetUrl = publicURL
-		assets = append(assets, asset)
+	path, err := u.imageStorage.Save("/invitations/", e.ImageFile)
+	if err != nil {
+		return 0, err
 	}
+	e.Image = &path
 
-	return u.invitationRepository.Create(ctx.Request().Context(), &e, assets)
+	path, err = u.imageStorage.Save("/invitations/", e.ImageFile1)
+	if err != nil {
+		return 0, err
+	}
+	e.Image1 = &path
+
+	return u.invitationRepository.Create(ctx.Request().Context(), &e)
+}
+
+func (u *invitationUsecase) GetInvitations(ctx echo.Context) (
+	[]entities.InvitationEntity, error,
+) {
+	return u.invitationRepository.GetInvitations(ctx.Request().Context())
+}
+
+func (u *invitationUsecase) GetInvitationBySlug(ctx echo.Context, slug string) (
+	*entities.InvitationEntity, error,
+) {
+	return u.invitationRepository.GetBySlug(ctx.Request().Context(), slug)
 }

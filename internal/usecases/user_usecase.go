@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	error_app "github.com/daytrip-idn-api/internal/error"
+	error_app "github.com/daytrip-idn-api/internal/error/app"
 	"github.com/daytrip-idn-api/internal/models"
 	"github.com/daytrip-idn-api/internal/repositories"
 	"github.com/daytrip-idn-api/pkg/utils"

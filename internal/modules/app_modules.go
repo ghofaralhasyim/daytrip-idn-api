@@ -14,6 +14,7 @@ type Repositories struct {
 	Destination        repositories.DestinationRepository
 	Message            repositories.MessageRepository
 	Activity           repositories.ActivityRepository
+	Invitation         repositories.InvitationRepository
 	InvitationResponse repositories.InvitationResponseRepository
 }
 
@@ -23,6 +24,8 @@ type Usecases struct {
 	Destination        usecases.DestinationUsecase
 	Message            usecases.MessageUsecase
 	Activity           usecases.ActivityUsecase
+	ImageStorage       usecases.ImageStorageUsecase
+	Invitation         usecases.InvitationUsecase
 	InvitationResponse usecases.InvitationResponseUsecase
 }
 
@@ -52,6 +55,7 @@ func NewAppModules(
 		Destination:        repositories.NewDestinationRepository(db),
 		Message:            repositories.NewMessageRepository(db),
 		Activity:           repositories.NewActivityRepository(db),
+		Invitation:         repositories.NewInvitationRepository(db),
 		InvitationResponse: repositories.NewInvitationResponseRepository(db),
 	}
 
@@ -61,6 +65,8 @@ func NewAppModules(
 		Destination:        usecases.NewDestinationUsecase(modules.Repositories.Destination),
 		Message:            usecases.NewMessageUsecase(modules.Repositories.Message),
 		Activity:           usecases.NewActivityUsecase(modules.Repositories.Activity),
+		ImageStorage:       usecases.NewImageStorageUsecase("./public/images"),
+		Invitation:         usecases.NewInvitationUsecase(modules.Repositories.Invitation, modules.Usecases.ImageStorage),
 		InvitationResponse: usecases.NewInvitationResponseUsecase(modules.Repositories.InvitationResponse),
 	}
 
@@ -70,7 +76,9 @@ func NewAppModules(
 		Destination: controllers.NewDestinationController(modules.Usecases.Destination),
 		Message:     controllers.NewMessageController(modules.Usecases.Message),
 		Activity:    controllers.NewActivityController(modules.Usecases.Activity),
-		Invitation:  controllers.NewInvitationController(modules.Usecases.InvitationResponse),
+		Invitation: controllers.NewInvitationController(
+			modules.Usecases.InvitationResponse, modules.Usecases.Invitation,
+		),
 	}
 
 	return &modules

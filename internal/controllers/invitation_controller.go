@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/daytrip-idn-api/internal/entities"
+	error_app "github.com/daytrip-idn-api/internal/error/app"
+	error_data "github.com/daytrip-idn-api/internal/error/data"
 	rest_request "github.com/daytrip-idn-api/internal/rest/request"
 	response_transform "github.com/daytrip-idn-api/internal/rest/transform"
 	"github.com/daytrip-idn-api/internal/usecases"
@@ -16,13 +19,16 @@ import (
 
 type InvitationController struct {
 	invitationResponseUsecase usecases.InvitationResponseUsecase
+	invitationUsecase         usecases.InvitationUsecase
 }
 
 func NewInvitationController(
 	invitationResponseUsecase usecases.InvitationResponseUsecase,
+	invitationUsecase usecases.InvitationUsecase,
 ) *InvitationController {
 	return &InvitationController{
 		invitationResponseUsecase: invitationResponseUsecase,
+		invitationUsecase:         invitationUsecase,
 	}
 }
 
@@ -81,6 +87,42 @@ func (c *InvitationController) GetAttendance(ctx echo.Context) error {
 	}
 
 	response := response_transform.TransformListInvitationResponseResponse(result)
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"message": "ok",
+		"data":    response,
+	})
+}
+
+func (c *InvitationController) GetInvitations(ctx echo.Context) error {
+	result, err := c.invitationUsecase.GetInvitations(ctx)
+	if err != nil {
+		log.Println(err)
+		return helpers.EchoError(ctx, err)
+	}
+
+	response := response_transform.TransformListInvitationResponse(result)
+
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"message": "ok",
+		"data":    response,
+	})
+}
+
+func (c *InvitationController) GetInvitationBySlug(ctx echo.Context) error {
+	slug := ctx.Param("slug")
+	if slug == "" {
+		err := fmt.Errorf("invalid request")
+		return helpers.EchoError(ctx, error_app.NewAppError(error_data.InvalidDataRequest, err))
+	}
+
+	result, err := c.invitationUsecase.GetInvitationBySlug(ctx, slug)
+	if err != nil {
+		log.Println(err)
+		return helpers.EchoError(ctx, err)
+	}
+
+	response := response_transform.TransformInvitationResponse(result)
 
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"message": "ok",

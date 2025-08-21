@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/daytrip-idn-api/internal/entities"
-	app_error "github.com/daytrip-idn-api/internal/error"
+	app_error "github.com/daytrip-idn-api/internal/error/app"
 	"github.com/daytrip-idn-api/internal/repositories"
 	"github.com/labstack/echo/v4"
 )

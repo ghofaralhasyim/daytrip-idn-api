@@ -1,10 +1,12 @@
 package entities
 
-import "time"
+import (
+	"mime/multipart"
+	"time"
+)
 
 type InvitationEntity struct {
 	Id          int64
-	UserId      int64
 	Slug        string
 	Title       string
 	Description *string
@@ -16,12 +18,17 @@ type InvitationEntity struct {
 	Location    *string
 	DressCode   *string
 	CreatedAt   time.Time
-	Assets      []InvitationAssetEntity
+	Image       *string
+	Image1      *string
+	KeyPass     string
+
+	// req image
+	ImageFile  *multipart.FileHeader
+	ImageFile1 *multipart.FileHeader
 }
 
 func MakeInvitationEntity(
 	id int64,
-	userId int64,
 	slug string,
 	title string,
 	description *string,
@@ -33,10 +40,11 @@ func MakeInvitationEntity(
 	location *string,
 	dressCode *string,
 	createdAt time.Time,
+	image, image1 *string,
+	keyPass string,
 ) InvitationEntity {
 	return InvitationEntity{
 		Id:          id,
-		UserId:      userId,
 		Slug:        slug,
 		Title:       title,
 		Description: description,
@@ -48,5 +56,8 @@ func MakeInvitationEntity(
 		Location:    location,
 		DressCode:   dressCode,
 		CreatedAt:   createdAt,
+		Image:       image,
+		Image1:      image1,
+		KeyPass:     keyPass,
 	}
 }

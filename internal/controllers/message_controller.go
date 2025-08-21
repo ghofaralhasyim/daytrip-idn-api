@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/daytrip-idn-api/internal/entities"
-	error_app "github.com/daytrip-idn-api/internal/error"
+	error_app "github.com/daytrip-idn-api/internal/error/app"
 	rest_request "github.com/daytrip-idn-api/internal/rest/request"
 	response_transform "github.com/daytrip-idn-api/internal/rest/transform"
 	"github.com/daytrip-idn-api/internal/usecases"

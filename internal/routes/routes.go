@@ -8,6 +8,7 @@ import (
 
 func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 	apiv1 := e.Group("/v1")
+	apiv1.Static("/images", "public/images")
 
 	apiv1.POST("/login", m.Controllers.User.Login)
 
@@ -31,6 +32,15 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 	apiv1.GET("/activity",
 		m.Controllers.Activity.GetActivities,
 		middleware.AuthMiddleware,
+	)
+
+	// ========================== INVITATION ROUTES ======================== //
+	apiv1.GET("/invitations",
+		m.Controllers.Invitation.GetInvitations, middleware.AuthMiddleware,
+	)
+
+	apiv1.GET("/invitations/:slug",
+		m.Controllers.Invitation.GetInvitationBySlug,
 	)
 
 	apiv1.POST("/invitations/attendance",

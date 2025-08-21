@@ -61,46 +61,22 @@ CREATE TABLE destinations (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE invitation_templates (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,         -- e.g. "Birthday Template", "Wedding Template"
-    description TEXT,
-    invitation_assets_count INT,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
--- Template assets (backgrounds, images, etc.)
-CREATE TABLE invitation_template_assets (
-    id SERIAL PRIMARY KEY,
-    template_id INT NOT NULL REFERENCES invitation_templates(id) ON DELETE CASCADE,
-    asset_type VARCHAR(50) NOT NULL,     -- e.g. 'background', 'image', 'icon'
-    asset_url VARCHAR(500) NOT NULL,     -- link or path to the asset
-    sort_order INT DEFAULT 0,            -- ordering of assets if needed
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE invitations (
     id SERIAL PRIMARY KEY,
     slug VARCHAR(255) NOT NULL, 
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    template_id INT REFERENCES invitation_templates(id) ON DELETE SET NULL,
+    template_id INT,
     start_date TIMESTAMPTZ,
     end_date TIMESTAMPTZ,
     maps_url VARCHAR(255),
     address VARCHAR(255),
     location VARCHAR(255),
     dress_code VARCHAR(255),
+    image VARCHAR(255),
+    image1 VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
--- For custom image per user
-CREATE TABLE invitation_assets (
-    id SERIAL PRIMARY KEY,
-    invitation_id INT REFERENCES invitations(id) ON DELETE CASCADE,
-    asset_url VARCHAR(500) NOT NULL,
-    sort_order INT DEFAULT 0
 );
 
 CREATE TABLE invitation_response (
