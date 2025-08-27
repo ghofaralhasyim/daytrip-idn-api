@@ -22,6 +22,7 @@ type InvitationEntityResponse struct {
 	Image       *string    `json:"image"`
 	Image1      *string    `json:"image1"`
 	KeyPass     string     `json:"keyPass,omitempty"`
+	BirthdayVal *int64     `json:"birthdayVal"`
 }
 
 func TransformInvitationResponse(
@@ -43,6 +44,7 @@ func TransformInvitationResponse(
 		Image:       e.Image,
 		Image1:      e.Image1,
 		KeyPass:     e.KeyPass,
+		BirthdayVal: e.BirthdayVal,
 	}
 }
 

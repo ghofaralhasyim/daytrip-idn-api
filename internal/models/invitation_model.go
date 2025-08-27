@@ -23,6 +23,7 @@ type Invitation struct {
 	Image       string    `db:"image"`
 	Image1      string    `db:"image1"`
 	KeyPass     string    `db:"keyPass"`
+	BirthdayVal int64     `db:"birthday_val"`
 }
 
 func ToInvitationModel(e entities.InvitationEntity) Invitation {
@@ -42,5 +43,6 @@ func ToInvitationModel(e entities.InvitationEntity) Invitation {
 		Image:       *e.Image,
 		Image1:      *e.Image1,
 		KeyPass:     e.KeyPass,
+		BirthdayVal: *e.BirthdayVal,
 	}
 }

@@ -39,15 +39,31 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 		m.Controllers.Invitation.GetInvitations, middleware.AuthMiddleware,
 	)
 
+	apiv1.POST("/invitations",
+		m.Controllers.Invitation.CreateInvitation, middleware.AuthMiddleware,
+	)
+
+	apiv1.DELETE("/invitations/:id",
+		m.Controllers.Invitation.DeleteInvitation, middleware.AuthMiddleware,
+	)
+
 	apiv1.GET("/invitations/:slug",
 		m.Controllers.Invitation.GetInvitationBySlug,
 	)
 
-	apiv1.POST("/invitations/attendance",
-		m.Controllers.Invitation.InsertAttendance,
+	apiv1.GET("/admin/invitations/:slug",
+		m.Controllers.Invitation.GetAdminInvitationBySlug, middleware.AuthMiddleware,
 	)
 
-	apiv1.GET("/invitations/attendance",
-		m.Controllers.Invitation.GetAttendance,
+	apiv1.PUT("/invitations/:slug",
+		m.Controllers.Invitation.UpdateInvitation, middleware.AuthMiddleware,
+	)
+
+	apiv1.POST("/invitations/attendance",
+		m.Controllers.Invitation.InsertAttendance, middleware.AuthMiddleware,
+	)
+
+	apiv1.GET("/invitations/attendance/:slug",
+		m.Controllers.Invitation.GetAttendanceBySlug,
 	)
 }

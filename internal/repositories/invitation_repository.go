@@ -16,7 +16,11 @@ type (
 		Create(ctx context.Context, invitation *entities.InvitationEntity) (int64, error)
 		GetInvitations(ctx context.Context) ([]entities.InvitationEntity, error)
 		GetBySlug(ctx context.Context, slug string) (*entities.InvitationEntity, error)
+		GetById(ctx context.Context, id int) (*entities.InvitationEntity, error)
 		Update(ctx context.Context, invitation *entities.InvitationEntity) error
+		DeleteInvitation(ctx context.Context, tx *sql.Tx, id int) error
+		DeleteResponseInvitation(ctx context.Context, tx *sql.Tx, id int) error
+		BeginTx() (*sql.Tx, error)
 	}
 	invitationRepository struct {
 		db *sql.DB
@@ -57,9 +61,10 @@ func (r *invitationRepository) Create(ctx context.Context, invitation *entities.
 			created_at,
 			image,
 			image1,
-			"keyPass"
+			"keyPass",
+			birthday_val
 		) VALUES (
-			$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
+			$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
 		) RETURNING id
 	`
 
@@ -80,6 +85,7 @@ func (r *invitationRepository) Create(ctx context.Context, invitation *entities.
 		dataModel.Image,
 		dataModel.Image1,
 		dataModel.KeyPass,
+		dataModel.BirthdayVal,
 	).Scan(&invitationID)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert invitation: %w", err)
@@ -113,15 +119,16 @@ func (r *invitationRepository) Update(ctx context.Context, invitation *entities.
 			description = $3,
 			template_id = $4,
 			start_date = $5,
-			end_date = $6,
+			end_date = $6,	
 			maps_url = $7,
 			address = $8,
 			location = $9,
 			dress_code = $10,
 			image = $11,
 			image1 = $12,
-			"keyPass" = $13
-		WHERE id = $14
+			"keyPass" = $13,
+			birthday_val = $14
+		WHERE id = $15
 	`
 
 	_, err = tx.ExecContext(ctx,
@@ -139,6 +146,7 @@ func (r *invitationRepository) Update(ctx context.Context, invitation *entities.
 		dataModel.Image,
 		dataModel.Image1,
 		dataModel.KeyPass,
+		dataModel.BirthdayVal,
 		dataModel.Id, // WHERE id
 	)
 	if err != nil {
@@ -159,14 +167,14 @@ func (r *invitationRepository) GetBySlug(
 	columns := []string{
 		"id", "title", "slug", "description", "template_id",
 		"start_date", "end_date", "maps_url", "address", "location",
-		"dress_code", "created_at", "image", "image1", "keyPass",
+		"dress_code", "created_at", "image", "image1", "keyPass", "birthday_val",
 	}
 
 	query := `
 		SELECT 
 			id, title, slug, description, template_id,
 			start_date, end_date, maps_url, address, location,
-			dress_code, created_at, image, image1, "keyPass"
+			dress_code, created_at, image, image1, "keyPass", birthday_val
 		FROM invitations
 		WHERE slug = $1;
 	`
@@ -175,6 +183,9 @@ func (r *invitationRepository) GetBySlug(
 
 	result, err := helpers.ScanRowToStruct[models.Invitation](row, columns)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -194,6 +205,58 @@ func (r *invitationRepository) GetBySlug(
 		&result.Image,
 		&result.Image1,
 		result.KeyPass,
+		&result.BirthdayVal,
+	)
+
+	return &entity, nil
+}
+
+func (r *invitationRepository) GetById(
+	ctx context.Context, id int,
+) (*entities.InvitationEntity, error) {
+
+	columns := []string{
+		"id", "title", "slug", "description", "template_id",
+		"start_date", "end_date", "maps_url", "address", "location",
+		"dress_code", "created_at", "image", "image1", "keyPass", "birthday_val",
+	}
+
+	query := `
+		SELECT 
+			id, title, slug, description, template_id,
+			start_date, end_date, maps_url, address, location,
+			dress_code, created_at, image, image1, "keyPass", birthday_val
+		FROM invitations
+		WHERE id = $1;
+	`
+
+	row := r.db.QueryRowContext(ctx, query, id)
+
+	result, err := helpers.ScanRowToStruct[models.Invitation](row, columns)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	entity := entities.MakeInvitationEntity(
+		result.Id,
+		result.Slug,
+		result.Title,
+		&result.Description,
+		&result.TemplateId,
+		&result.StartDate,
+		&result.EndDate,
+		&result.MapsUrl,
+		&result.Address,
+		&result.Location,
+		&result.DressCode,
+		result.CreatedAt,
+		&result.Image,
+		&result.Image1,
+		result.KeyPass,
+		&result.BirthdayVal,
 	)
 
 	return &entity, nil
@@ -206,7 +269,7 @@ func (r *invitationRepository) GetInvitations(ctx context.Context) (
 		SELECT 
 			id, title, slug, description, template_id,
 			start_date, end_date, maps_url, address, location,
-			dress_code, created_at, image, image1, "keyPass"
+			dress_code, created_at, image, image1, "keyPass", birthday_val
 		FROM invitations;
 	`
 
@@ -230,10 +293,40 @@ func (r *invitationRepository) GetInvitations(ctx context.Context) (
 			&item.MapsUrl, &item.Address,
 			&item.Location, &item.DressCode,
 			item.CreatedAt, &item.Image, &item.Image1,
-			item.KeyPass,
+			item.KeyPass, &item.BirthdayVal,
 		)
 		invitations = append(invitations, entity)
 	}
 
 	return invitations, nil
+}
+
+func (r *invitationRepository) BeginTx() (*sql.Tx, error) {
+	return r.db.Begin()
+}
+
+func (r *invitationRepository) DeleteResponseInvitation(ctx context.Context, tx *sql.Tx, id int) error {
+	query := `
+		DELETE FROM invitation_response WHERE id = $1;
+	`
+
+	_, err := tx.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *invitationRepository) DeleteInvitation(ctx context.Context, tx *sql.Tx, id int) error {
+	query := `
+		DELETE FROM invitations WHERE id = $1;
+	`
+
+	_, err := tx.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

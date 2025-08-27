@@ -15,6 +15,7 @@ type (
 	InvitationResponseRepository interface {
 		Create(ctx context.Context, response *entities.InvitationResponseEntity) (int64, error)
 		GetInvitationResponse(ctx context.Context) ([]entities.InvitationResponseEntity, error)
+		GetInvitationResponseBySlug(ctx context.Context, slug string) ([]entities.InvitationResponseEntity, error)
 	}
 
 	invitationResponseRepository struct {
@@ -65,6 +66,35 @@ func (r *invitationResponseRepository) GetInvitationResponse(ctx context.Context
 	query := `SELECT ` + column + " FROM invitation_response;"
 
 	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	results, err := helpers.ScanRowsToStructs[models.InvitationResponse](rows)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]entities.InvitationResponseEntity, 0)
+	for _, item := range results {
+		entity := entities.MakeInvitationResponseEntity(
+			item.Id, item.InvitationId, item.Name, item.IsAttending,
+			item.Message, item.CreatedAt,
+		)
+		response = append(response, *entity)
+	}
+
+	return response, nil
+}
+
+func (r *invitationResponseRepository) GetInvitationResponseBySlug(ctx context.Context, slug string) ([]entities.InvitationResponseEntity, error) {
+	alias := "r"
+	column := helpers.GenerateSelectColumns[models.InvitationResponse](&alias)
+
+	query := `SELECT ` + column + " FROM invitation_response r LEFT JOIN invitations i ON i.id = r.invitation_id WHERE i.slug = $1;"
+
+	rows, err := r.db.QueryContext(ctx, query, slug)
 	if err != nil {
 		return nil, err
 	}

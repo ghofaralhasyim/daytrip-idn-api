@@ -21,6 +21,7 @@ type InvitationEntity struct {
 	Image       *string
 	Image1      *string
 	KeyPass     string
+	BirthdayVal *int64
 
 	// req image
 	ImageFile  *multipart.FileHeader
@@ -42,6 +43,7 @@ func MakeInvitationEntity(
 	createdAt time.Time,
 	image, image1 *string,
 	keyPass string,
+	birthdayVal *int64,
 ) InvitationEntity {
 	return InvitationEntity{
 		Id:          id,
@@ -59,5 +61,6 @@ func MakeInvitationEntity(
 		Image:       image,
 		Image1:      image1,
 		KeyPass:     keyPass,
+		BirthdayVal: birthdayVal,
 	}
 }

@@ -24,7 +24,6 @@ type Usecases struct {
 	Destination        usecases.DestinationUsecase
 	Message            usecases.MessageUsecase
 	Activity           usecases.ActivityUsecase
-	ImageStorage       usecases.ImageStorageUsecase
 	Invitation         usecases.InvitationUsecase
 	InvitationResponse usecases.InvitationResponseUsecase
 }
@@ -65,8 +64,7 @@ func NewAppModules(
 		Destination:        usecases.NewDestinationUsecase(modules.Repositories.Destination),
 		Message:            usecases.NewMessageUsecase(modules.Repositories.Message),
 		Activity:           usecases.NewActivityUsecase(modules.Repositories.Activity),
-		ImageStorage:       usecases.NewImageStorageUsecase("./public/images"),
-		Invitation:         usecases.NewInvitationUsecase(modules.Repositories.Invitation, modules.Usecases.ImageStorage),
+		Invitation:         usecases.NewInvitationUsecase(modules.Repositories.Invitation),
 		InvitationResponse: usecases.NewInvitationResponseUsecase(modules.Repositories.InvitationResponse),
 	}
 

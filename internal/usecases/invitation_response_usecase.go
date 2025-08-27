@@ -9,6 +9,7 @@ import (
 type InvitationResponseUsecase interface {
 	SubmitResponse(ctx echo.Context, e entities.InvitationResponseEntity) (int64, error)
 	GetInvitationResponse(ctx echo.Context) ([]entities.InvitationResponseEntity, error)
+	GetInvitationResponseBySlug(ctx echo.Context, slug string) ([]entities.InvitationResponseEntity, error)
 }
 
 type invitationResponseUsecase struct {
@@ -32,4 +33,8 @@ func (u *invitationResponseUsecase) SubmitResponse(
 
 func (u *invitationResponseUsecase) GetInvitationResponse(ctx echo.Context) ([]entities.InvitationResponseEntity, error) {
 	return u.responseRepo.GetInvitationResponse(ctx.Request().Context())
+}
+
+func (u *invitationResponseUsecase) GetInvitationResponseBySlug(ctx echo.Context, slug string) ([]entities.InvitationResponseEntity, error) {
+	return u.responseRepo.GetInvitationResponseBySlug(ctx.Request().Context(), slug)
 }
