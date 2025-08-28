@@ -30,8 +30,8 @@ type (
 
 func NewInvitationUsecase(
 	invitationRepository repositories.InvitationRepository,
+	imageStorage ImageStorageUsecase,
 ) InvitationUsecase {
-	imageStorage := NewImageStorageUsecase("./public/images")
 	return &invitationUsecase{
 		invitationRepository: invitationRepository,
 		imageStorage:         imageStorage,

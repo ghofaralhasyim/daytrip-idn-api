@@ -1,5 +1,7 @@
 package entities
 
+import "mime/multipart"
+
 type BannerEntity struct {
 	Id           int64
 	DesktopImage string
@@ -8,6 +10,10 @@ type BannerEntity struct {
 	CtaUrl       string
 	Title        string
 	Description  string
+
+	//
+	MobileImageFile  *multipart.FileHeader
+	DesktopImageFile *multipart.FileHeader
 }
 
 func MakeBannerEntity(
@@ -25,6 +31,7 @@ func MakeBannerEntity(
 		MobileImage:  mobileImage,
 		Cta:          cta,
 		CtaUrl:       ctaUrl,
+		Title:        title,
 		Description:  description,
 	}
 }

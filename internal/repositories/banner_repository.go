@@ -11,8 +11,11 @@ import (
 
 type (
 	BannerRepository interface {
-		InsertBanner(ctx context.Context, data entities.BannerEntity) (entities.BannerEntity, error)
+		InsertBanner(ctx context.Context, data *entities.BannerEntity) (entities.BannerEntity, error)
 		GetBanners(ctx context.Context) ([]entities.BannerEntity, error)
+		UpdateBanner(ctx context.Context, data *entities.BannerEntity) (entities.BannerEntity, error)
+		GetBannerById(ctx context.Context, id int) (*entities.BannerEntity, error)
+		DeleteBanner(ctx context.Context, id int) error
 	}
 
 	bannerRepository struct {
@@ -27,10 +30,10 @@ func NewBannerRepository(db *sql.DB) BannerRepository {
 }
 
 func (r *bannerRepository) InsertBanner(
-	ctx context.Context, data entities.BannerEntity,
+	ctx context.Context, data *entities.BannerEntity,
 ) (entities.BannerEntity, error) {
 
-	model := models.ToBannerModel(data)
+	model := models.ToBannerModel(*data)
 
 	query := `
 		INSERT INTO banners
@@ -51,19 +54,57 @@ func (r *bannerRepository) InsertBanner(
 		model.CtaUrl, model.Title, model.Description,
 	).Scan(&model.Id)
 	if err != nil {
-		return data, err
+		return *data, err
 	}
 
 	data.Id = model.Id
 
-	return data, nil
+	return *data, nil
+}
+
+func (r *bannerRepository) UpdateBanner(
+	ctx context.Context, data *entities.BannerEntity,
+) (entities.BannerEntity, error) {
+
+	model := models.ToBannerModel(*data)
+
+	query := `
+		UPDATE banners
+		SET
+			desktop_image = $1,
+			mobile_image  = $2,
+			cta           = $3,
+			cta_url       = $4,
+			title         = $5,
+			description   = $6
+		WHERE id = $7;
+	`
+
+	_, err := r.db.ExecContext(ctx,
+		query,
+		model.DesktopImage,
+		model.MobileImage,
+		model.Cta,
+		model.CtaUrl,
+		model.Title,
+		model.Description,
+		model.Id,
+	)
+
+	if err != nil {
+		return *data, err
+	}
+
+	data.Id = model.Id
+
+	return *data, nil
 }
 
 func (r *bannerRepository) GetBanners(ctx context.Context) ([]entities.BannerEntity, error) {
 
 	column := helpers.GenerateSelectColumns[models.Banner](nil)
 
-	query := `SELECT ` + column + " FROM banners;"
+	query := `SELECT ` + column + " FROM banners ORDER BY id;"
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -80,10 +121,43 @@ func (r *bannerRepository) GetBanners(ctx context.Context) ([]entities.BannerEnt
 	for _, item := range results {
 		entity := entities.MakeBannerEntity(
 			item.Id, item.DesktopImage, item.MobileImage, item.Cta,
-			item.Title, item.CtaUrl, item.Description,
+			item.CtaUrl, item.Title, item.Description,
 		)
 		banners = append(banners, *entity)
 	}
 
 	return banners, nil
+}
+
+func (r *bannerRepository) DeleteBanner(ctx context.Context, id int) error {
+	query := `DELETE FROM banners WHERE id = $1;`
+
+	_, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *bannerRepository) GetBannerById(ctx context.Context, id int) (*entities.BannerEntity, error) {
+	column := helpers.GenerateSelectColumns[models.Banner](nil)
+
+	query := `SELECT ` + column + " FROM banners WHERE id = $1;"
+
+	row := r.db.QueryRowContext(ctx, query, id)
+
+	result, err := helpers.ScanRowToStruct[models.Banner](row, []string{"id", "desktop_image", "mobile_image", "cta", "cta_url", "title", "description"})
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	entity := entities.MakeBannerEntity(
+		result.Id, result.DesktopImage, result.MobileImage, result.Cta, result.CtaUrl, result.Title, result.Description,
+	)
+
+	return entity, nil
 }
