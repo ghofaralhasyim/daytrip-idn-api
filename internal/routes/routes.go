@@ -12,12 +12,16 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 
 	apiv1.POST("/login", m.Controllers.User.Login)
 
+	// ========================== BANNERS ROUTES ======================== //
+
 	apiv1.GET("/banners", m.Controllers.Banner.GetBanners)
 	apiv1.POST("/banners", m.Controllers.Banner.CreateBanners, middleware.AuthMiddleware)
 	apiv1.PUT("/banners", m.Controllers.Banner.UpdateBanner, middleware.AuthMiddleware)
 	apiv1.DELETE("/banners/:id", m.Controllers.Banner.DeleteBanner, middleware.AuthMiddleware)
 
 	apiv1.GET("/destinations", m.Controllers.Destination.GetDestinations)
+
+	// ========================== MESSAGES ROUTES ======================== //
 
 	apiv1.GET("/messages",
 		m.Controllers.Message.GetMessages,

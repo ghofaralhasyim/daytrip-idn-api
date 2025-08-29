@@ -9,6 +9,7 @@ import (
 type MessageResponse struct {
 	Id          int64     `json:"id"`
 	Phone       string    `json:"phone"`
+	Name        string    `json:"name"`
 	Email       string    `json:"email"`
 	PackageName string    `json:"packageName"`
 	Message     string    `json:"message"`
@@ -25,6 +26,7 @@ func TransformMessageResponse(
 		PackageName: e.PackageName,
 		Message:     e.Message,
 		CreatedAt:   e.CreatedAt,
+		Name:        e.Name,
 	}
 }
 

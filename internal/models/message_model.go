@@ -9,6 +9,7 @@ import (
 type Message struct {
 	Id          int64     `db:"id"`
 	Phone       string    `db:"phone"`
+	Name        string    `db:"name"`
 	Email       string    `db:"email"`
 	PackageName string    `db:"package_name"`
 	Message     string    `db:"message"`
@@ -21,6 +22,7 @@ func ToMessageModel(
 	return Message{
 		Id:          e.Id,
 		Phone:       e.Phone,
+		Name:        e.Name,
 		Email:       e.Email,
 		PackageName: e.PackageName,
 		Message:     e.Message,

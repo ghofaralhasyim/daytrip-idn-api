@@ -34,15 +34,15 @@ func (r *messageRepository) InsertMessage(
 
 	query := `
 		INSERT INTO messages
-			(phone, email, package_name, message)
+			(phone, email, package_name, message, name)
 		VALUES
-			($1, $2, $3, $4)
+			($1, $2, $3, $4, $5)
 		RETURNING id, created_at;
 	`
 
 	err := r.db.QueryRowContext(
 		ctx, query,
-		model.Phone, model.Email, model.PackageName, model.Message,
+		model.Phone, model.Email, model.PackageName, model.Message, model.Name,
 	).Scan(&model.Id, &model.CreatedAt)
 	if err != nil {
 		return data, err
@@ -75,7 +75,7 @@ func (r *messageRepository) GetMessages(
 	messages := make([]entities.MessageEntity, 0)
 	for _, item := range results {
 		entity := entities.MakeMessageEntity(
-			item.Id, item.Phone, item.Email, item.PackageName, item.Message, item.CreatedAt,
+			item.Id, item.Phone, item.Email, item.PackageName, item.Message, item.CreatedAt, item.Name,
 		)
 		messages = append(messages, *entity)
 	}

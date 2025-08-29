@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -96,6 +97,9 @@ func (r *invitationResponseRepository) GetInvitationResponseBySlug(ctx context.C
 
 	rows, err := r.db.QueryContext(ctx, query, slug)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
 		return nil, err
 	}
 	defer rows.Close()

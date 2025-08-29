@@ -8,6 +8,7 @@ type MessageEntity struct {
 	Email       string
 	PackageName string
 	Message     string
+	Name        string
 	CreatedAt   time.Time
 }
 
@@ -18,6 +19,7 @@ func MakeMessageEntity(
 	PackageName string,
 	Message string,
 	CreatedAt time.Time,
+	Name string,
 ) *MessageEntity {
 	return &MessageEntity{
 		Id:          Id,
@@ -25,6 +27,7 @@ func MakeMessageEntity(
 		Email:       Email,
 		PackageName: PackageName,
 		Message:     Message,
+		Name:        Name,
 		CreatedAt:   CreatedAt,
 	}
 }
