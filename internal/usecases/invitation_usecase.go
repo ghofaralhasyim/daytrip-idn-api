@@ -92,10 +92,7 @@ func (u *invitationUsecase) UpdateInvitation(ctx echo.Context, e entities.Invita
 		}
 		err = u.imageStorage.Delete(*data.Image)
 		if err != nil {
-			if !strings.Contains(err.Error(), "file does not exist") {
-				return nil, error_app.NewAppError(error_app.RepositoryDeleteError, err)
-			}
-			err = nil
+			log.Println(err.Error())
 		}
 		e.Image = &path
 	} else {
@@ -109,8 +106,8 @@ func (u *invitationUsecase) UpdateInvitation(ctx echo.Context, e entities.Invita
 		}
 		err = u.imageStorage.Delete(*data.Image1)
 		if err != nil {
-			if !strings.Contains(err.Error(), "file does not exist") {
-				return nil, error_app.NewAppError(error_app.RepositoryDeleteError, err)
+			if err != nil {
+				log.Println(err.Error())
 			}
 			err = nil
 		}
