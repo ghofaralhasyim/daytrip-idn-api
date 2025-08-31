@@ -66,7 +66,7 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 	)
 
 	apiv1.POST("/invitations/attendance",
-		m.Controllers.Invitation.InsertAttendance, middleware.AuthMiddleware,
+		m.Controllers.Invitation.InsertAttendance,
 	)
 
 	apiv1.GET("/invitations/attendance/:slug",
