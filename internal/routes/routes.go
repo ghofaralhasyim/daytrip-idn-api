@@ -29,7 +29,6 @@ func SetupRoutes(e *echo.Echo, m *modules.AppModules) {
 	)
 	apiv1.POST("/messages",
 		m.Controllers.Message.InsertMessage,
-		middleware.AuthMiddleware,
 	)
 	apiv1.DELETE("/message/:messageId",
 		m.Controllers.Message.DeleteMessage,

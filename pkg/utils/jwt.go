@@ -13,7 +13,7 @@ import (
 func GenerateSessionToken(user *models.User) (string, error) {
 	hoursCount, err := strconv.Atoi(os.Getenv("JWT_EXPIRE_HOURS"))
 	if err != nil {
-		return "", err
+		hoursCount = 1
 	}
 
 	claims := jwt.MapClaims{}

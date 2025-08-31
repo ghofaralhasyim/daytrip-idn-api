@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,6 +45,7 @@ func (c *MessageController) GetMessages(ctx echo.Context) error {
 func (c *MessageController) InsertMessage(ctx echo.Context) error {
 	var req rest_request.MessageRequest
 	if err := ctx.Bind(&req); err != nil {
+		log.Println(err)
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid request"})
 	}
 
@@ -66,6 +68,7 @@ func (c *MessageController) InsertMessage(ctx echo.Context) error {
 	}
 
 	reqEntity := entities.MessageEntity{
+		Name:        req.Name,
 		Phone:       req.Phone,
 		Email:       req.Email,
 		PackageName: req.PackageName,

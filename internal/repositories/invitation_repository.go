@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -275,6 +276,9 @@ func (r *invitationRepository) GetInvitations(ctx context.Context) (
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	defer rows.Close()

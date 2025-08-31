@@ -75,8 +75,10 @@ CREATE TABLE invitations (
     address VARCHAR(255),
     location VARCHAR(255),
     dress_code VARCHAR(255),
+    birthday_val INT,
     image VARCHAR(255),
     image1 VARCHAR(255),
+    keyPass VARCHAR(255),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
