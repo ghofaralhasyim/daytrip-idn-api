@@ -35,7 +35,7 @@ func (u *imageStorageUsecase) Save(path string, fileHeader *multipart.FileHeader
 
 	ext := filepath.Ext(fileHeader.Filename)
 	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	dstPath := filepath.Join(u.publicDir, path, filename)
+	dstPath := filepath.Join("./public/images", path, filename)
 
 	log.Println("\n ================> saving image", dstPath)
 
@@ -58,7 +58,7 @@ func (u *imageStorageUsecase) Delete(filePath string) error {
 	// Build full path if the filePath is relative
 	fullPath := filePath
 	if !filepath.IsAbs(filePath) {
-		fullPath = filepath.Join(u.publicDir, filePath)
+		fullPath = filepath.Join("./public/images", filePath)
 	}
 
 	// Check if the file exists
