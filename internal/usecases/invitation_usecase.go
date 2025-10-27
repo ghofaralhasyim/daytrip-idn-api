@@ -43,6 +43,10 @@ func (u *invitationUsecase) CreateInvitation(ctx echo.Context, e entities.Invita
 		e.Slug = helpers.GenerateSlug(e.Title)
 	}
 
+	if e.TemplateId == 2 {
+		e.Slug += "-birthday-party"
+	}
+
 	if e.ImageFile != nil {
 		path, err := u.imageStorage.Save("/invitations/", e.ImageFile)
 		if err != nil {
