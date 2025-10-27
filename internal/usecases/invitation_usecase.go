@@ -43,6 +43,20 @@ func (u *invitationUsecase) CreateInvitation(ctx echo.Context, e entities.Invita
 		e.Slug = helpers.GenerateSlug(e.Title)
 	}
 
+	ctr := 1
+	for {
+		data, err := u.invitationRepository.GetBySlug(ctx.Request().Context(), e.slug)
+		if err != nil {
+			return nil, error_app.NewAppError(error_app.RepositoryGetError, err)
+		}
+		if data == nil {
+			break
+		}
+
+		ctr++
+		e.Slug += fmt.Sprintf("%s-%d", e.Slug, ctr)
+	}
+
 	if e.TemplateId == 2 {
 		e.Slug += "-birthday-party"
 	}
