@@ -43,7 +43,7 @@ func (u *invitationUsecase) CreateInvitation(ctx echo.Context, e entities.Invita
 		e.Slug = helpers.GenerateSlug(e.Title)
 	}
 
-	if e.TemplateId == int64(2) {
+	if e.TemplateId != nil && *e.TemplateId == int64(2) {
 		e.Slug += "-birthday-party"
 	}
 
